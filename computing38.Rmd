@@ -1,0 +1,335 @@
+---
+title: "3.8 Computing"
+author: "Alain Kuiete"
+date: "6/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Preprocessing
+
+```{r}
+library(AppliedPredictiveModeling)
+data(segmentationOriginal)
+```
+
+```{r}
+head(segmentationOriginal)
+```
+
+Filter the train set
+```{r}
+segData <- subset(segmentationOriginal, Case == "Train")
+```
+
+
+
+The Class and Cell fields will be saved into separate vectors, then removed
+from the main object:
+```{r}
+cellID <- segData$Cell
+class <- segData$Class
+case <- segData$Case
+# Now remove the columns
+segData <- segData[, -(1:3)]
+```
+
+
+The original data contained several “status” columns which were binary versions
+of the predictors. To remove these, we find the column names containing
+"Status" and remove them:
+```{r}
+statusColNum <- grep("Status", names(segData))
+statusColNum
+```
+
+```{r}
+segData <- segData[, -statusColNum]
+```
+
+### Transformations
+
+As previously discussed, some features exhibited significantly skewness. The
+skewness function in the e1071 package calculates the sample skewness statistic
+for each predictor:
+```{r}
+library(e1071)
+# For one predictor:
+skewness(segData$AngleCh1)
+```
+
+```{r}
+# Since all the predictors are numeric columns, the apply function can
+# be used to compute the skewness across columns.
+skewValues <- apply(segData, 2, skewness)
+head(skewValues)
+```
+
+Using these values as a guide, the variables can be prioritized for visualizing
+the distribution. The basic R function hist or the histogram function in the
+lattice can be used to assess the shape of the distribution.
+To determine which type of transformation should be used, the MASS
+package contains the boxcox function. Although this function estimates λ, it
+does not create the transformed variable(s). A caret function, BoxCoxTrans,
+can find the appropriate transformation and apply them to the new data:
+
+```{r}
+library(caret)
+Ch1AreaTrans <- BoxCoxTrans(segData$AreaCh1)
+Ch1AreaTrans
+```
+
+
+```{r}
+# The original data
+head(segData$AreaCh1)
+```
+
+```{r}
+# After transformation
+predict(Ch1AreaTrans, head(segData$AreaCh1))
+```
+
+(x^lambda - 1)/(-lambda)
+```{r}
+(819^(-.9) - 1)/(-.9)
+```
+
+Another caret function, preProcess, applies this transformation to a set of
+predictors. This function is discussed below. The base R function prcomp can
+be used for PCA. In the code below, the data are centered and scaled prior
+to PCA.
+```{r}
+pcaObject <- prcomp(segData,
+center = TRUE, scale. = TRUE)
+# Calculate the cumulative percentage of variance which each component
+# accounts for.
+percentVariance <- pcaObject$sd^2/sum(pcaObject$sd^2)*100
+percentVariance[1:3]
+```
+
+The transformed values are stored in pcaObject as a sub-object called x:
+
+```{r}
+head(pcaObject$x[, 1:5])
+```
+
+The another sub-object called rotation stores the variable loadings, where
+rows correspond to predictor variables and columns are associated with the
+components:
+
+```{r}
+head(pcaObject$rotation[, 1:3])
+```
+
+The caret package class spatialSign contains functionality for the spatial sign
+transformation. Although we will not apply this technique to these data, the
+basic syntax would be spatialSign(segData).
+Also, these data do not have missing values for imputation. To impute
+missing values, the impute package has a function, impute.knn, that uses Knearest
+neighbors to estimate the missing data. The previously mentioned
+preProcess function applies imputation methods based on K-nearest neighbors
+or bagged trees.
+To administer a series of transformations to multiple data sets, the caret
+class preProcess has the ability to transform, center, scale, or impute values,
+as well as apply the spatial sign transformation and feature extraction. The
+function calculates the required quantities for the transformation. After calling
+the preProcess function, the predict method applies the results to a set
+of data. For example, to Box–Cox transform, center, and scale the data, then
+execute PCA for signal extraction, the syntax would be:
+
+
+```{r}
+trans <- preProcess(segData, method = c("BoxCox", "center", "scale", "pca"))
+trans
+```
+
+```{r}
+# Apply the transformations:
+transformed <- predict(trans, segData)
+# These values are different than the previous PCA components since
+# they were transformed prior to PCA
+head(transformed[, 1:5])
+```
+
+
+
+
+
+The order in which the possible transformation are applied is transformation,
+centering, scaling, imputation, feature extraction, and then spatial sign.
+Many of the modeling functions have options to center and scale prior
+to modeling. For example, when using the train function (discussed in later
+chapters), there is an option to use preProcess prior to modeling within the
+resampling iterations.
+
+
+### Filtering
+
+To filter for near-zero variance predictors, the caret package function nearZero
+Var will return the column numbers of any predictors that fulfill the conditions
+outlined in Sect. 3.5. For the cell segmentation data, there are no problematic
+predictors:
+```{r}
+nearZeroVar(segData)
+# When predictors should be removed, a vector of integers is
+# returned that indicates which columns should be removed.
+```
+
+
+```{r}
+correlations <- cor(segData)
+dim(correlations)
+```
+
+
+Similarly, to filter on between-predictor correlations, the cor function can
+calculate the correlations between predictor variables:
+
+```{r}
+correlations[1:4, 1:4]
+```
+
+
+To visually examine the correlation structure of the data, the corrplot package
+contains an excellent function of the same name. The function has many
+options including one that will reorder the variables in a way that reveals
+clusters of highly correlated predictors. The following command was used to
+produce Fig. 3.10:
+```{r}
+library(corrplot)
+corrplot(correlations, order = "hclust")
+```
+
+
+
+56 3 Data Pre-processing
+The size and color of the points are associated with the strength of correlation
+between two predictor variables.
+To filter based on correlations, the findCorrelation function will apply the
+algorithm in Sect. 3.5. For a given threshold of pairwise correlations, the function
+returns column numbers denoting the predictors that are recommended
+for deletion:
+```{r}
+highCorr <- findCorrelation(correlations, cutoff = .75)
+length(highCorr)
+```
+
+```{r}
+head(highCorr)
+```
+
+
+```{r}
+filteredSegData <- segData[, -highCorr]
+```
+
+
+There are also several functions in the subselect package that can accomplish
+the same goal.
+
+
+### Creating Dummy Variables
+
+Several methods exist for creating dummy variables based on a particular
+model. Section 4.9 discusses different methods for specifying how the predictors
+enter into the model. One approach, the formula method, allows great
+flexibility to create the model function. Using formulas in model functions parameterizes
+the predictors such that not all categories have dummy variables.
+This approach will be shown in greater detail for linear regression.
+As previously mentioned, there are occasions when a complete set of
+dummy variables is useful. For example, the splits in a tree-based model
+are more interpretable when the dummy variables encode all the information
+for that predictor. We recommend using the full set if dummy variables when
+working with tree-based models.
+To illustrate the code, we will take a subset of the cars data set in the
+caret package. For 2005, Kelly Blue Book resale data for 804 GM cars were
+collected (Kuiper 2008). The object of the model was to predict the price of
+the car based on known characteristics. This demonstration will focus on the
+price, mileage, and car type (e.g., sedan) for a subset of vehicles:
+
+
+```{r}
+library(caret)
+head(cars)
+cars
+```
+
+
+```{r}
+ head(carSubset)
+```
+
+>
+Price Mileage Type
+214 19981 24323 sedan
+299 21757 1853 sedan
+460 15047 12305 sedan
+728 15327 4318 sedan
+162 20628 20770 sedan
+718 16714 26328 sedan
+> levels(carSubset$Type)
+[1] "convertible" "coupe" "hatchback" "sedan" "wagon"
+3.8 Computing 57
+To model the price as a function of mileage and type of car, we can use
+the function dummyVars to determine encodings for the predictors. Suppose
+our first model assumes that the price can be modeled as a simple additive
+function of the mileage and type:
+> simpleMod <- dummyVars(~Mileage + Type,
++ data = carSubset,
++ ## Remove the variable name from the
++ ## column name
++ levelsOnly = TRUE)
+> simpleMod
+Dummy Variable Object
+Formula: ~Mileage + Type
+2 variables, 1 factors
+Factor variable names will be removed
+To generate the dummy variables for the training set or any new samples,
+the predict method is used in conjunction with the dummyVars object:
+> predict(simpleMod, head(carSubset))
+Mileage convertible coupe hatchback sedan wagon
+214 24323 0 0 0 1 0
+299 1853 0 0 0 1 0
+460 12305 0 0 0 1 0
+728 4318 0 0 0 1 0
+162 20770 0 0 0 1 0
+718 26328 0 0 0 1 0
+The type field was expanded into five variables for five factor levels. The
+model is simple because it assumes that effect of the mileage is the same for
+every type of car. To fit a more advance model, we could assume that there
+is a joint effect of mileage and car type. This type of effect is referred to as
+an interaction. In the model formula, a colon between factors indicates that
+an interaction should be generated. For these data, this adds another five
+predictors to the data frame:
+> withInteraction <- dummyVars(~Mileage + Type + Mileage:Type,
++ data = carSubset,
++ levelsOnly = TRUE)
+> withInteraction
+Dummy Variable Object
+Formula: ~Mileage + Type + Mileage:Type
+2 variables, 1 factors
+Factor variable names will be removed
+> predict(withInteraction, head(carSubset))
+
+
+```{r}
+library(mlbench)
+data(Glass)
+str(Glass)
+```
+
+
+
+
+
+
+
+
+
+
+

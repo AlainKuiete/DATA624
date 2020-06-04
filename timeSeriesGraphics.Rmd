@@ -1,0 +1,112 @@
+---
+title: "The Time Series Graphics"
+author: "Alain Kuiete"
+date: "6/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load the libraries
+```{r}
+library(fpp2)
+```
+
+
+```{r}
+help(gold)
+```
+
+```{r}
+tsdisplay(gold)
+```
+
+```{r}
+autoplot(gold)
+```
+
+```{r}
+frequency(gold)
+```
+
+Outlier
+```{r}
+which.max(gold)
+```
+
+```{r}
+
+```
+
+
+```{r}
+help(woolyrnq)
+```
+
+```{r}
+tsdisplay(woolyrnq)
+```
+
+
+```{r}
+autoplot(woolyrnq)
+```
+
+
+```{r}
+frequency(woolyrnq)
+```
+
+Outlier
+```{r}
+which.max(woolyrnq)
+```
+second quarter of 1969
+
+
+```{r}
+
+```
+
+
+```{r}
+which.min(woolyrnq)
+```
+Second quarter of 1975
+
+```{r}
+help(gas)
+```
+
+```{r}
+tsdisplay(gas)
+```
+
+```{r}
+autoplot(gas)
+```
+
+```{r}
+frequency(gas)
+```
+```{r}
+which.max(gas)
+```
+
+```{r}
+which.max(gas)/frequency(gas) + 1956
+```
+
+
+```{r}
+seasonplot(gas)
+```
+
+```{r}
+autoplot()
+```
+
+
+

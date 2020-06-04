@@ -1,0 +1,34 @@
+Optional videos for material in Hyndman
+Posted on: Wednesday, September 18, 2019 6:54:14 PM EDT
+
+As mentioned, a few videos for material for Hyndman and Time Series.  OPTIONAL, not required.
+
+
+
+Video	Link	Time
+R14 Basic Exponential Smoothing in R and RStudio	https://youtu.be/aquvCL3_6pI	Time 8:46
+R15 Holt’s Linear Trend Basics in R and RStudio	https://youtu.be/Nrt3kNEHb4I	Time 10:05
+R18 Estimating ets() Models in R and R Studio	https://youtu.be/we2YHM8G8rs	Time 11:00
+R19 Forecasting ets Models in R and R Studio	https://youtu.be/wvK8wbBK9mA	Time 4:44
+R20 ARIMA Introduction in R and R Studio Stationarity and Differencing	https://youtu.be/3i2R5FxQyoY	Time 13:19
+R21 ARIMA, White Noise, Random Walks	https://youtu.be/ZVN88aWeZhY	Time 5:24
+R22 ARIMA, Seasonal and Second Order Differencing	https://youtu.be/BdCBnAbyXvY	Time 9:36
+R23 ARIMA, Stationarity Testing	https://youtu.be/LGfCurzDJPE	Time 7:55
+R24 World Development Indicators, Part I Data Exploration Time Series and Forecasting	https://youtu.be/uSGfrUnn4YA	Time 12:07
+R25 World Development Indicators, Part II Forecasting	https://youtu.be/LJQ-yT7MGmI	Time 6:48
+R26 Creating a Multivariate Time Series in R World Development Indicators, Part III	https://youtu.be/EB7i0Da5NC0	Time 4:33
+R27 Vector Autoregressive (VAR) Models,  World Development Indicators, Part IV	https://youtu.be/jVxa-UQyRSU	Time 6:12
+R28 Financial Modeling Intro to Quantmod, Preparing for GARCH	https://youtu.be/4ypWCNQ-Dfg	Time 6:04
+R29 Intro to GARCH, Generalized Autoregressive Conditional Heteroskedasticity	https://youtu.be/FhbNiOFQSco	Time 9:01
+R30 Intro to AR(p) Models	https://youtu.be/nVvE3m2jSLk	Time 8:45
+R31 Intro to Moving Average MA(q) Models	https://youtu.be/hw8tHLJp9KE	Time 4:52
+R32 Intro to Non Seasonal ARIMA models in R and RStudio	https://youtu.be/3Q3nORP5bT0	Time 5:20
+R33 Understanding Non-Seasonal ARIMA models using R via RStudio	https://youtu.be/7gWi4ITjsDk	Time 6:44
+R34 Some Cursory Comments on fpp2 and auto arima	https://youtu.be/4B2vwawgPrw	Time 5:18
+R35 Seasonal ARIMA Models, Part I	https://youtu.be/bY4m5rbd_NA	Time 8:03
+R36 Seasonal ARIMA Models, Part II	https://youtu.be/Et95oScDr6I	Time 6:51
+R37 Seasonal ARIMA Models, Part II	https://youtu.be/oufF7awBaeo	Time 5:24
+R38  ARIMA vs ETS	https://youtu.be/uo6FDbSwFBI	Time 9:17
+
+
+R17 Innovations state space models for exponential smoothing, Ready for ETS	https://youtu.be/lZljENQwtbQ
