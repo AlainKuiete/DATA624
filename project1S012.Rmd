@@ -1,0 +1,118 @@
+---
+title: "Forecast"
+author: "Groupe 3"
+date: "6/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+```{r}
+library(fpp2)
+library(dplyr)
+library(VIM)
+```
+
+
+```{r}
+data_project <- readxl::read_excel("Data Set for Class.xls")
+head(data_project)
+```
+#### Subsetting the dataset
+```{r}
+S01 <- subset(data_project, group == 'S01', select = c(SeriesInd, Var01, Var02))
+summary(S01)
+```
+
+
+
+```{r}
+var02 <- select(filter(S01, SeriesInd <= 43021), Var02)
+```
+
+
+```{r}
+summary(var02)
+```
+
+```{r}
+str(var02)
+```
+
+
+
+#### Visualization
+```{r}
+var02 <- ts(var02, frequency = 1)
+autoplot(var02)
+```
+
+```{r}
+library("imputeTS")
+var02 <- na_interpolation(var02)
+summary(var02)
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+hist(var02)
+```
+
+```{r}
+boxplot(var02)
+```
+
+```{r}
+autoplot(diff(var02))
+```
+
+
+```{r}
+autoplot(acf(var02))
+```
+
+```{r}
+autoplot(acf(diff(log2(var02))))
+```
+
+
+```{r}
+# Produce 10 year forecasts of austa using holt()
+fcholt <- holt(log2(var02), h = 140)
+```
+
+
+```{r}
+# Look at fitted model using summary()
+summary(fcholt)
+```
+
+
+```{r}
+# Plot the forecasts
+autoplot(fcholt)
+```
+
+
+```{r}
+# Check that the residuals look like white noise
+checkresiduals(fcholt)
+```
+
+
+
+
+
+
+
+
+
+

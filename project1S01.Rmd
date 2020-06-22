@@ -1,0 +1,57 @@
+---
+title: "Forecast"
+author: "Groupe 3"
+date: "6/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+```{r}
+library(fpp2)
+library(titdyr)
+```
+```{r}
+data_project <- readxl::read_excel("Data Set for Class.xls")
+head(data_project)
+```
+#### Subsetting the dataset
+```{r}
+S01 <- subset(data_project, group == 'S01', select = c(SeriesInd, Var01, Var02))
+summary(S01)
+```
+#### Visualization
+```{r}
+scatter.smooth(S01[,"Var01"])
+```
+
+```{r}
+var01 <- ts(S01$Var01)
+autoplot(var01)
+```
+
+```{r}
+hist(var01)
+```
+
+```{r}
+boxplot(var01)
+```
+
+```{r}
+
+```
+
+
+```{r}
+library(mice)
+MICE <- mice(Soybean, method="pmm", printFlag=FALSE, seed=6)
+aggr(complete(MICE), prop = c(TRUE, TRUE), bars=TRUE, numbers=TRUE, sortVars=TRUE)
+```
+
+
+
+
